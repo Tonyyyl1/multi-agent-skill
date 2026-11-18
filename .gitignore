@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# OS metadata (macOS & Windows)
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Desktop.ini
+
+# Temp / scratch outputs
+.scratch*/
+scratch/
+*.tmp
+execution_report.json
+blueprint.local.json

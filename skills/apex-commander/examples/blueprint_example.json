@@ -1,0 +1,129 @@
+{
+  "task_title": "Cross-Platform Expression Compiler & Evaluator Engine",
+  "commander_model": "inherit",
+  "max_rounds": 3,
+  "pass_score_threshold": 95,
+  "workspace_mode": "inherit",
+  "user_requirements": [
+    "REQ-1: Lexer and Pratt parser supporting arithmetic, booleans, variables, conditionals, and function calls with exact line/column diagnostics.",
+    "REQ-2: Static type checker catching undefined symbols, arity mismatches, and incompatible operand types before evaluation.",
+    "REQ-3: Bytecode compiler and stack VM evaluator with deterministic execution and recursion depth protection.",
+    "REQ-4: Cross-platform CLI (macOS + Windows UTF-8 file & stdin support) plus comprehensive unit/integration test suite."
+  ],
+  "architecture_contract": "Package root `expr_engine/`. Shared AST, token types, source spans, and diagnostic classes live exclusively in `expr_engine/contracts.py`. All file I/O must use `pathlib.Path` with explicit `encoding='utf-8'`. No module outside `cli.py` may read `sys.argv` or print directly to stdout.",
+  "global_acceptance_criteria": [
+    "AC-1: All unit and integration tests pass with exit code 0.",
+    "AC-2: Zero TODO/FIXME/NotImplementedError placeholders across the codebase.",
+    "AC-3: Full macOS and Windows compatibility (pathlib paths, UTF-8 I/O, no OS-specific shell invocations)."
+  ],
+  "verification_commands": [
+    "pytest -q"
+  ],
+  "initial_waves": [
+    {
+      "wave_name": "Wave 1 - Shared Contracts & Package Skeleton",
+      "tasks": [
+        {
+          "id": "W1-T1",
+          "title": "Create AST, Token, Type, Bytecode OpCode & Diagnostic Contracts",
+          "tier": "flash",
+          "owned_files": [
+            "expr_engine/__init__.py",
+            "expr_engine/contracts.py"
+          ],
+          "readonly_files": [],
+          "instructions": "Define immutable dataclasses/enums for SourceSpan, Token, TokenKind, Expr AST nodes, ValueType, OpCode, Instruction, and DiagnosticError in `expr_engine/contracts.py`, and export public symbols in `expr_engine/__init__.py`.",
+          "acceptance_check": "Verify module imports cleanly without syntax or circular import errors."
+        },
+        {
+          "id": "W1-T2",
+          "title": "Create Cross-Platform Test Fixtures & Project Config",
+          "tier": "flash_lite",
+          "owned_files": [
+            "pyproject.toml",
+            "tests/conftest.py"
+          ],
+          "readonly_files": [],
+          "instructions": "Create minimal pytest configuration in `pyproject.toml` and reusable sample expression cases (valid programs + type/syntax error cases) in `tests/conftest.py`.",
+          "acceptance_check": "Verify `pyproject.toml` and `tests/conftest.py` are valid UTF-8 and syntactically clean."
+        }
+      ]
+    },
+    {
+      "wave_name": "Wave 2 - Massive Parallel Core & Peripheral Implementation",
+      "tasks": [
+        {
+          "id": "W2-T1",
+          "title": "Implement Lexer & Pratt Parser",
+          "tier": "flash",
+          "owned_files": [
+            "expr_engine/lexer.py",
+            "expr_engine/parser.py"
+          ],
+          "readonly_files": [
+            "expr_engine/contracts.py"
+          ],
+          "instructions": "Implement `tokenize(source: str) -> list[Token]` and `parse(tokens: list[Token]) -> Expr` adhering strictly to `expr_engine/contracts.py` with accurate line/col spans.",
+          "acceptance_check": "Check syntax and verify all AST node constructors match `contracts.py`."
+        },
+        {
+          "id": "W2-T2",
+          "title": "Implement Static Type Checker",
+          "tier": "flash",
+          "owned_files": [
+            "expr_engine/typechecker.py"
+          ],
+          "readonly_files": [
+            "expr_engine/contracts.py"
+          ],
+          "instructions": "Implement `typecheck(expr: Expr, env: dict[str, ValueType]) -> ValueType` raising `DiagnosticError` on undefined variables, wrong function arity, or type mismatches.",
+          "acceptance_check": "Verify all AST variants in `contracts.py` are handled exhaustively."
+        },
+        {
+          "id": "W2-T3",
+          "title": "Implement Bytecode Compiler & Stack VM",
+          "tier": "flash",
+          "owned_files": [
+            "expr_engine/compiler.py",
+            "expr_engine/vm.py"
+          ],
+          "readonly_files": [
+            "expr_engine/contracts.py"
+          ],
+          "instructions": "Compile `Expr` to `list[Instruction]` and execute deterministically in `StackVM` with configurable max call/stack depth guard.",
+          "acceptance_check": "Verify every `OpCode` in `contracts.py` is emitted and executed consistently."
+        },
+        {
+          "id": "W2-T4",
+          "title": "Implement Cross-Platform CLI & Public Facade",
+          "tier": "flash_lite",
+          "owned_files": [
+            "expr_engine/cli.py",
+            "README.md"
+          ],
+          "readonly_files": [
+            "expr_engine/contracts.py"
+          ],
+          "instructions": "Build `cli.py` using `argparse` and `pathlib.Path(..., encoding='utf-8')` supporting `--eval` and file execution on both macOS and Windows, plus concise usage docs in `README.md`.",
+          "acceptance_check": "Ensure no hardcoded OS paths or platform-specific shell assumptions exist."
+        },
+        {
+          "id": "W2-T5",
+          "title": "Implement End-to-End Unit & Integration Test Suite",
+          "tier": "flash",
+          "owned_files": [
+            "tests/test_lexer_parser.py",
+            "tests/test_typechecker_vm.py",
+            "tests/test_cli.py"
+          ],
+          "readonly_files": [
+            "expr_engine/contracts.py",
+            "tests/conftest.py"
+          ],
+          "instructions": "Write thorough tests covering precedence, associativity, conditionals, functions, error diagnostics, VM recursion limits, and UTF-8 CLI file execution.",
+          "acceptance_check": "Ensure imports match module APIs and edge cases are asserted."
+        }
+      ]
+    }
+  ]
+}
